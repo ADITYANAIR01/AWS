@@ -23,7 +23,7 @@ An **Application Load Balancer (ALB)** operates at **OSI Layer 7** (the applicat
 
 ## Video Demo
 
-[Watch full demo](./application-load-balancer.mp4)
+[![Application Load Balancer – Full Demo](https://img.youtube.com/vi/JrgvgSGxSdw/0.jpg)](https://youtu.be/JrgvgSGxSdw)
 
 ---
 
