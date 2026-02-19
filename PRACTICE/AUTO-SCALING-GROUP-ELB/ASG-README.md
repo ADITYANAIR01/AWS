@@ -28,7 +28,7 @@ An **Auto Scaling Group (ASG)** is an AWS service that automatically manages a f
 
 ## Video Demo
 
-[Watch full demo](./auto-scaling-group-elb.mp4)
+[![Auto Scaling Group with ELB – Full Demo](https://img.youtube.com/vi/gUS-584nZ7M/0.jpg)](https://youtu.be/gUS-584nZ7M)
 
 ---
 
