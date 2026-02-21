@@ -19,6 +19,12 @@
 
 ---
 
+## Video Demo
+
+[![S3 Static Website Hosting – Full Demo](https://img.youtube.com/vi/klEGEw2O6q0/0.jpg)](https://youtu.be/klEGEw2O6q0)
+
+---
+
 ## Step-by-Step Walkthrough
 
 ### Step 1 — Open AWS Console and Navigate to S3
