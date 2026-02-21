@@ -6,6 +6,7 @@ Automatically renames screenshots sequentially and videos to match folder name.
 
 import os
 import re
+import shutil
 from pathlib import Path
 from typing import List, Tuple
 
@@ -162,6 +163,65 @@ def execute_renaming(folder_path: str, rename_plan: List[Tuple[str, str]]) -> in
     return success_count
 
 
+def move_to_images_folder(folder_path: str) -> int:
+    """
+    Create an 'images' folder and move all media files into it.
+    Returns: number of files successfully moved
+    """
+    folder = Path(folder_path)
+    images_folder = folder / "images"
+    
+    # Create images folder if it doesn't exist
+    try:
+        images_folder.mkdir(exist_ok=True)
+        print(f"\n📁 Created folder: {images_folder}")
+    except Exception as e:
+        print(f"\n✗ Error creating images folder: {e}")
+        return 0
+    
+    # Find all media files in the current folder
+    media_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', 
+                       '.mp4', '.avi', '.mov', '.mkv', '.webm', '.flv'}
+    
+    moved_count = 0
+    
+    for file in folder.iterdir():
+        if file.is_file() and file.suffix.lower() in media_extensions:
+            try:
+                destination = images_folder / file.name
+                shutil.move(str(file), str(destination))
+                moved_count += 1
+            except Exception as e:
+                print(f"  ✗ Error moving {file.name}: {e}")
+    
+    return moved_count
+
+
+def create_readme_file(folder_path: str, prefix: str) -> bool:
+    """
+    Create a README.md file with the folder name.
+    Returns: True if successful, False otherwise
+    """
+    folder = Path(folder_path)
+    readme_name = f"{prefix.upper()}-README.md"
+    readme_path = folder / readme_name
+    
+    try:
+        # Create README with basic template
+        with open(readme_path, 'w', encoding='utf-8') as f:
+            f.write(f"# {prefix.upper()}\n\n")
+            f.write(f"## Overview\n\n")
+            f.write(f"\n\n## Screenshots\n\n")
+            f.write(f"Images are located in the `images/` folder.\n")
+        
+        print(f"\n📝 Created README: {readme_name}")
+        return True
+    
+    except Exception as e:
+        print(f"\n✗ Error creating README file: {e}")
+        return False
+
+
 def main():
     """Main function."""
     print("\n" + "=" * 60)
@@ -235,6 +295,15 @@ def main():
     success_count = execute_renaming(folder_path, rename_plan)
     
     print(f"\n✓ Successfully renamed {success_count} file(s)!")
+    
+    # Move files to images folder
+    print("\nMoving files to 'images' folder...")
+    moved_count = move_to_images_folder(folder_path)
+    
+    print(f"\n✓ Successfully moved {moved_count} file(s) to images folder!")
+    
+    # Create README file
+    create_readme_file(folder_path, prefix)
 
 
 if __name__ == "__main__":
