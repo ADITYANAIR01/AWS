@@ -1,0 +1,9 @@
+# Local environment files
+.env
+*.env
+aws-cloud-drive/CODE/.env
+
+# Python artifacts
+__pycache__/
+*.pyc
+.venv/
