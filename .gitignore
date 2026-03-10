@@ -2,6 +2,7 @@
 .env
 *.env
 aws-cloud-drive/CODE/.env
+.DS_Store
 
 # Python artifacts
 __pycache__/
