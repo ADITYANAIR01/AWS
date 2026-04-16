@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ContainerDock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.15);
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-logo .dock-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      list-style: none;
+    }
+
+    .nav-links li { cursor: pointer; transition: color 0.2s; }
+    .nav-links li:hover { color: var(--text); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #5254cc; }
+
+    /* HERO */
+    .hero {
+      padding: 5rem 2.5rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-glow);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #a5b4fc;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto 3rem;
+      padding: 0 2.5rem;
+    }
+
+    .stat {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+    }
+
+    .stat:first-child { border-radius: 12px 0 0 12px; }
+    .stat:last-child { border-radius: 0 12px 12px 0; }
+    .stat + .stat { border-left: none; }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* SECTION */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2.5rem 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    /* SERVICE CARDS */
+    .services-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1.2fr;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .service-card:hover { border-color: var(--accent); }
+
+    .service-name {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .service-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .service-name-text strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .service-name-text span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-badge.running {
+      background: rgba(34,197,94,0.1);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+
+    .status-badge.deploying {
+      background: rgba(234,179,8,0.1);
+      color: var(--yellow);
+      border: 1px solid rgba(234,179,8,0.2);
+    }
+
+    .status-badge.stopped {
+      background: rgba(239,68,68,0.1);
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .running .status-dot { animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .col-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .col-label strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.875rem;
+    }
+
+    /* TABLE HEADER */
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1.2fr;
+      gap: 1rem;
+      padding: 0 1.5rem 0.75rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    /* INFRA SECTION */
+    .infra-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .infra-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .infra-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .infra-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 0.25rem;
+    }
+
+    .infra-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-stack {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .stack-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .service-card { grid-template-columns: 1fr 1fr; }
+      .table-header { display: none; }
+      .infra-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="dock-icon">⚓</div>
+    ContainerDock
+  </div>
+  <ul class="nav-links">
+    <li>Services</li>
+    <li>Deployments</li>
+    <li>Logs</li>
+    <li>Settings</li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn btn-ghost">Docs</button>
+    <button class="btn btn-primary">+ New Service</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">
+    <span>●</span> Running on AWS ECS Fargate — ap-south-1
+  </div>
+  <h1>Deploy containers.<br/><span>Ship faster.</span></h1>
+  <p>ContainerDock runs your Docker containers on managed AWS infrastructure — no servers to manage, no config overhead.</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary">Deploy a Service</button>
+    <button class="btn btn-ghost">View Logs</button>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-value">6</div>
+    <div class="stat-label">Running Services</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">99.9%</div>
+    <div class="stat-label">Uptime</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">1</div>
+    <div class="stat-label">Deploying</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">ap-south-1</div>
+    <div class="stat-label">Region</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Active Services</div>
+    <button class="btn btn-ghost" style="font-size:0.8rem; padding: 0.4rem 1rem;">Refresh</button>
+  </div>
+
+  <div class="table-header">
+    <div>Service</div>
+    <div>Status</div>
+    <div>Uptime</div>
+    <div>Region</div>
+    <div>Image</div>
+  </div>
+
+  <div class="services-grid" id="services"></div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Infrastructure</div>
+  </div>
+  <div class="infra-grid">
+    <div class="infra-card">
+      <div class="infra-card-header">⚙️ Compute</div>
+      <div class="infra-value">Fargate</div>
+      <div class="infra-sub">Serverless containers — no EC2 management</div>
+    </div>
+    <div class="infra-card">
+      <div class="infra-card-header">🗂️ Registry</div>
+      <div class="infra-value">ECR</div>
+      <div class="infra-sub">Private Docker image registry — ap-south-1</div>
+    </div>
+    <div class="infra-card">
+      <div class="infra-card-header">🌐 Load Balancer</div>
+      <div class="infra-value">ALB</div>
+      <div class="infra-sub">Application Load Balancer with HTTPS + ACM</div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2.5rem 4rem;">
+  <footer>
+    <div>Built by Aditya Nair · containerdock.adityanair.tech</div>
+    <div class="footer-stack">
+      <span class="stack-tag">ECS</span>
+      <span class="stack-tag">ECR</span>
+      <span class="stack-tag">ALB</span>
+      <span class="stack-tag">Fargate</span>
+      <span class="stack-tag">CloudWatch</span>
+      <span class="stack-tag">ACM</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const services = [
+    { name: "containerdock-app",   desc: "node.js/express",        status: "running",   uptime: "14d 6h",  region: "ap-south-1", image: "containerdock:v1.2",   color: "#6366f1", icon: "⚓" },
+    { name: "api-gateway-service", desc: "python/flask",           status: "running",   uptime: "9d 3h",   region: "ap-south-1", image: "api-gw:latest",        color: "#22c55e", icon: "🔗" },
+    { name: "auth-service",        desc: "node.js/express",        status: "running",   uptime: "9d 3h",   region: "ap-south-1", image: "auth-svc:v2.1",        color: "#f59e0b", icon: "🔐" },
+    { name: "worker-queue",        desc: "python/celery",          status: "deploying", uptime: "—",       region: "ap-south-1", image: "worker:v0.9-beta",     color: "#eab308", icon: "⚙️" },
+    { name: "postgres-proxy",      desc: "pgbouncer",              status: "running",   uptime: "21d 0h",  region: "ap-south-1", image: "pgbouncer:1.20",       color: "#3b82f6", icon: "🗄️" },
+    { name: "static-cdn-origin",   desc: "nginx/static",           status: "running",   uptime: "21d 0h",  region: "ap-south-1", image: "nginx:alpine",         color: "#8b5cf6", icon: "📦" },
+    { name: "metrics-collector",   desc: "prometheus/exporter",    status: "stopped",   uptime: "—",       region: "ap-south-1", image: "metrics:v1.0",         color: "#ef4444", icon: "📊" },
+  ];
+
+  const grid = document.getElementById('services');
+
+  services.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <div class="service-name">
+        <div class="service-icon" style="background:${s.color}22; color:${s.color}">${s.icon}</div>
+        <div class="service-name-text">
+          <strong>${s.name}</strong>
+          <span>${s.desc}</span>
+        </div>
+      </div>
+      <div>
+        <span class="status-badge ${s.status}">
+          <span class="status-dot"></span>
+          ${s.status}
+        </span>
+      </div>
+      <div class="col-label"><strong>${s.uptime}</strong>uptime</div>
+      <div class="col-label"><strong>${s.region}</strong>region</div>
+      <div class="col-label"><strong>${s.image}</strong>image tag</div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+</body>
+</html>
