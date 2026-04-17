@@ -210,9 +210,13 @@ def create_readme_file(folder_path: str, prefix: str) -> bool:
         # Create README with basic template
         with open(readme_path, 'w', encoding='utf-8') as f:
             f.write(f"# {prefix.upper()}\n\n")
-            f.write(f"## Overview\n\n")
-            f.write(f"\n\n## Screenshots\n\n")
-            f.write(f"Images are located in the `images/` folder.\n")
+            f.write("## Screenshots\n\n")
+            f.write("All images are located in the [`/images`](./images) folder in chronological order.\n\n")
+            f.write("## 👨‍💻 Author\n\n")
+            f.write("### Aditya Nair\n\n")
+            f.write("- GitHub: [@ADITYANAIR01](https://github.com/ADITYANAIR01)\n\n")
+            f.write("- LinkedIn: [linkedin.com/in/adityanair001](https://www.linkedin.com/in/adityanair001)\n\n")
+            f.write("- Portfolio: [adityanair.tech](https://www.adityanair.tech)\n")
         
         print(f"\n📝 Created README: {readme_name}")
         return True
